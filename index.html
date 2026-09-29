@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENATI - Ejercicio 10: Número Primo</title>
+  
+  <style>
+    /* Reset & Estilos Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --accent: #8b5cf6;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Layout principal */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 350px 1fr;
+      }
+    }
+
+    /* Tarjetas */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    /* Formularios e Inputs */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Botones de Acceso Rápido */
+    .quick-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-quick {
+      background-color: #090d16;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.4rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-quick:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Botones principales */
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    button.btn-main {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button.btn-main:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: #334155;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+
+    /* Mensajes de Alerta */
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: none;
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    /* Banner de Resultado */
+    .status-banner {
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      border: 2px solid transparent;
+      display: none;
+    }
+
+    .status-banner.show {
+      display: block;
+    }
+
+    .status-banner.es-primo {
+      background-color: rgba(16, 185, 129, 0.15);
+      border-color: var(--success);
+      color: #6ee7b7;
+    }
+
+    .status-banner.no-primo {
+      background-color: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+      color: #fca5a5;
+    }
+
+    .status-banner.especial {
+      background-color: rgba(245, 158, 11, 0.15);
+      border-color: var(--warning);
+      color: #fcd34d;
+    }
+
+    .status-banner .status-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .status-banner .status-sub {
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      opacity: 0.9;
+    }
+
+    /* Métricas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+      background-color: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem;
+      text-align: center;
+    }
+
+    .stat-card .title {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card .val {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 0.2rem;
+      font-family: monospace;
+    }
+
+    /* Explicación Algorítmica */
+    .logic-box {
+      background-color: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .logic-box span {
+      color: var(--text-main);
+      font-weight: bold;
+    }
+
+    .placeholder-text {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SENATI - Algoritmos y Programación</h1>
+    <p>Práctica Dirigida Nivel 1 • Ejercicio 10: Determinar si un Número es Primo</p>
+  </header>
+
+  <div class="container">
+    
+    <!-- Panel Izquierdo: Entrada de Datos -->
+    <div class="card">
+      <h2>Ingreso de Datos</h2>
+      <form id="primoForm" onsubmit="return false;">
+        <div class="form-group">
+          <label for="numInput">Ingrese un Número Entero Positivo:</label>
+          <input type="number" id="numInput" min="0" step="1" placeholder="Ej. 17" required>
+        </div>
+
+        <div class="form-group">
+          <label>Probar Valores Rápidos:</label>
+          <div class="quick-buttons">
+            <button type="button" class="btn-quick" onclick="cargarNumero(2)">2 (Único Par Primo)</button>
+            <button type="button" class="btn-quick" onclick="cargarNumero(7)">7 (Primo)</button>
+            <button type="button" class="btn-quick" onclick="cargarNumero(13)">13 (Primo)</button>
+            <button type="button" class="btn-quick" onclick="cargarNumero(15)">15 (Compuesto)</button>
+            <button type="button" class="btn-quick" onclick="cargarNumero(1)">1 (Especial)</button>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn-main btn-primary" id="btnVerificar">Verificar Primo</button>
+          <button type="button" class="btn-main btn-secondary" id="btnLimpiar">Limpiar</button>
+        </div>
+      </form>
+
+      <!-- Alerta de Validación -->
+      <div id="alertBox" class="alert"></div>
+    </div>
+
+    <!-- Panel Derecho: Resultados -->
+    <div class="card">
+      <h2>Resultado de la Evaluación</h2>
+      
+      <div class="placeholder-text" id="placeholder">
+        Ingrese un número entero y presione "Verificar Primo".
+      </div>
+
+      <div id="resultsContainer" style="display: none;">
+        
+        <!-- Banner de Estado -->
+        <div class="status-banner" id="statusBanner">
+          <div class="status-title" id="statusTitle">--</div>
+          <div class="status-sub" id="statusSub">--</div>
+        </div>
+
+        <!-- Métricas del Cálculo -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="title">Clasificación</div>
+            <div class="val" id="valClasif" style="font-size: 1.1rem;">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="title">Total Divisores</div>
+            <div class="val" id="valCantDiv">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="title">Límite √N</div>
+            <div class="val" id="valSqrt">0</div>
+          </div>
+        </div>
+
+        <!-- Explicación Algorítmica -->
+        <div class="logic-box" id="logicBox">
+          --
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const numInput = document.getElementById('numInput');
+      const btnVerificar = document.getElementById('btnVerificar');
+      const btnLimpiar = document.getElementById('btnLimpiar');
+      const alertBox = document.getElementById('alertBox');
+
+      const placeholder = document.getElementById('placeholder');
+      const resultsContainer = document.getElementById('resultsContainer');
+
+      const statusBanner = document.getElementById('statusBanner');
+      const statusTitle = document.getElementById('statusTitle');
+      const statusSub = document.getElementById('statusSub');
+
+      const valClasif = document.getElementById('valClasif');
+      const valCantDiv = document.getElementById('valCantDiv');
+      const valSqrt = document.getElementById('valSqrt');
+      const logicBox = document.getElementById('logicBox');
+
+      // Mostrar mensaje de error
+      function showError(msg) {
+        if (msg) {
+          alertBox.textContent = msg;
+          alertBox.classList.add('show');
+        } else {
+          alertBox.classList.remove('show');
+        }
+      }
+
+      // Cargar número desde botones de acceso rápido
+      window.cargarNumero = (n) => {
+        numInput.value = n;
+        verificarPrimo();
+      };
+
+      // Obtener todos los divisores positivos de un número
+      function obtenerDivisores(num) {
+        const divisores = [];
+        for (let i = 1; i <= num; i++) {
+          if (num % i === 0) divisores.push(i);
+        }
+        return divisores;
+      }
+
+      // Función Principal de Evaluación Algorítmica
+      function verificarPrimo() {
+        const val = numInput.value.trim();
+
+        if (val === '') {
+          showError('Por favor ingrese un número.');
+          return;
+        }
+
+        const num = parseFloat(val);
+
+        if (isNaN(num) || !Number.isInteger(num)) {
+          showError('Ingrese un número entero válido.');
+          return;
+        }
+
+        if (num < 0) {
+          showError('Ingrese un número entero no negativo (0 o mayor).');
+          return;
+        }
+
+        showError(null);
+
+        // Casos Especiales: N <= 1
+        if (num <= 1) {
+          statusBanner.className = 'status-banner show especial';
+          statusTitle.textContent = 'NO ES PRIMO NI COMPUESTO';
+          statusSub.textContent = `El número ${num} no se considera primo por definición (requiere exactamente 2 divisores positivos distintos: 1 y él mismo).`;
+
+          valClasif.textContent = 'ESPECIAL';
+          valClasif.style.color = 'var(--warning)';
+          valCantDiv.textContent = num === 1 ? '1' : 'Infinitos';
+          valSqrt.textContent = Math.floor(Math.sqrt(num));
+
+          logicBox.innerHTML = `
+            ⚙️ <strong>Análisis del Número ${num}:</strong><br>
+            • Por convención matemática, los números menores o iguales a 1 <span>no son primos</span>.<br>
+            • El número 1 solo tiene 1 divisor (él mismo), por lo cual no cumple la condición de tener 2 divisores exactos.
+          `;
+
+          placeholder.style.display = 'none';
+          resultsContainer.style.display = 'block';
+          return;
+        }
+
+        // Algoritmo Optimizado: Verificar divisibilidad hasta √N
+        const limiteSqrt = Math.floor(Math.sqrt(num));
+        let primerDivisor = null;
+
+        for (let i = 2; i <= limiteSqrt; i++) {
+          if (num % i === 0) {
+            primerDivisor = i;
+            break; // Se encontró un divisor exacto, no es primo
+          }
+        }
+
+        const esPrimo = (primerDivisor === null);
+        const divisores = obtenerDivisores(num);
+
+        // Actualizar UI según resultado
+        if (esPrimo) {
+          statusBanner.className = 'status-banner show es-primo';
+          statusTitle.textContent = '¡ES UN NÚMERO PRIMO!';
+          statusSub.textContent = `El número ${num} es divisible únicamente entre 1 y ${num}.`;
+
+          valClasif.textContent = 'PRIMO';
+          valClasif.style.color = 'var(--success)';
+
+          logicBox.innerHTML = `
+            ⚙️ <strong>Demostración Algorítmica:</strong><br>
+            • Límite de prueba (√${num}): <span>${limiteSqrt}</span><br>
+            • Ningún entero entre 2 y ${limiteSqrt} divide exactamente a ${num}.<br>
+            • Lista completa de divisores: <span>[${divisores.join(', ')}]</span> (${divisores.length} divisores).
+          `;
+        } else {
+          statusBanner.className = 'status-banner show no-primo';
+          statusTitle.textContent = 'NO ES PRIMO (ES COMPUESTO)';
+          statusSub.textContent = `El número ${num} es divisible entre más de 2 números (ej. es divisible entre ${primerDivisor}).`;
+
+          valClasif.textContent = 'COMPUESTO';
+          valClasif.style.color = 'var(--danger)';
+
+          logicBox.innerHTML = `
+            ⚙️ <strong>Demostración Algorítmica:</strong><br>
+            • Límite de prueba (√${num}): <span>${limiteSqrt}</span><br>
+            • Se encontró que es divisible entre <span>${primerDivisor}</span> (${num} ÷ ${primerDivisor} = ${num / primerDivisor}).<br>
+            • Lista de divisores: <span>[${divisores.length > 10 ? divisores.slice(0, 10).join(', ') + '...' : divisores.join(', ')}]</span>.
+          `;
+        }
+
+        valCantDiv.textContent = divisores.length;
+        valSqrt.textContent = limiteSqrt;
+
+        // Mostrar Panel de Resultados
+        placeholder.style.display = 'none';
+        resultsContainer.style.display = 'block';
+      }
+
+      // Limpiar Formulario
+      function limpiar() {
+        numInput.value = '';
+        showError(null);
+        placeholder.style.display = 'block';
+        resultsContainer.style.display = 'none';
+        numInput.focus();
+      }
+
+      // Event Listeners
+      btnVerificar.addEventListener('click', verificarPrimo);
+      btnLimpiar.addEventListener('click', limpiar);
+
+      numInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verificarPrimo();
+      });
+    });
+  </script>
+</body>
+</html>
